@@ -1,4 +1,3 @@
-import sun.util.calendar.LocalGregorianCalendar;
 
 import javax.swing.*;
 import java.io.*;
@@ -19,7 +18,7 @@ public class Configuration { //this class allows the program to remember user se
     }
 
     public Configuration () {
-        new Configuration("Generic Program", "config.xml");
+        new Configuration("Generic Program", "AHPCompanionV2_Configuration.xml");
     }
 
     public void saveConfiguration(String key, String val) { //allows the program to store a property in the XML
