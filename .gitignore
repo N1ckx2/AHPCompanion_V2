@@ -18,6 +18,12 @@ hs_err_pid*
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/dictionaries
+AHPCompanion_V2.iml
+.idea
+.idea/**/misc.xml
+.idea/**/modules.xml
+.idea/**/vcs.xml
+
 
 # Sensitive or high-churn files:
 .idea/**/dataSources/
