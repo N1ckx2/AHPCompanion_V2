@@ -8,44 +8,30 @@ import java.awt.event.ActionListener;
  */
 public class AHPCompanion2_GUI extends JFrame implements ActionListener {
     private JPanel panel;
+    private JComboBox apComboBox;
+    private JComboBox gComboBox;
+    private JComboBox tComboBox;
+    private JRadioButton scanOrImgRadio;
+    private JTextField sourceText;
+    private JTextField destText;
+    private JLabel apLabel;
+    private JLabel gLabel;
+    private JLabel tLabel;
+    private JLabel destPathLabel;
+    private JLabel sourcePathLabel;
     private JTextField traverse, fit;
     private JComboBox<String> scanOrImg;
     private JButton enter, settings;
     private AHP_Companion_2 main;
 
     public AHPCompanion2_GUI () {
-        //Configure JPanels
-        panel = new JPanel();
-        panel.setLayout(new FlowLayout());
-
-        //Set up JComponents
-        traverse = new JTextField(4);
-        fit = new JTextField(4);
-        scanOrImg = new JComboBox<String>();
-        scanOrImg.addItem("Scans");
-        scanOrImg.addItem("Images");
-
-        //Set up Buttons
-        enter = new JButton("Enter");
-        settings = new JButton("Settings");
-        enter.addActionListener(this);
-        settings.addActionListener(this);
-
-        //Add Necessary Components to JPanel
-        panel.add(new JLabel("Traverse:"));
-        panel.add(traverse);
-        panel.add(new JLabel("Fit:"));
-        panel.add(fit);
-        panel.add(scanOrImg);
-        panel.add(enter);
-        panel.add(settings);
-
         //Configure JFrame
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); //makes the buttons look and feel like windows
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         setTitle("AHP Companion 2");
         setContentPane(panel);
         pack ();
@@ -81,5 +67,21 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener {
 
     public static void main (String[] args){
         new AHPCompanion2_GUI();
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+        panel = new JPanel();
+        apLabel = new JLabel();
+        gLabel = new JLabel();
+        apComboBox = new JComboBox();
+        gComboBox = new JComboBox();
+        tLabel = new JLabel();
+        tComboBox = new JComboBox();
+        scanOrImgRadio = new JRadioButton();
+        sourceText = new JTextField();
+        destText = new JTextField();
+        sourcePathLabel = new JLabel();
+        destPathLabel = new JLabel();
     }
 }

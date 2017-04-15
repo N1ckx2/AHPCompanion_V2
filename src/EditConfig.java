@@ -18,6 +18,10 @@ public class EditConfig extends JFrame implements ActionListener {
         config = c;
         gui = g;
         fileChooser = new JFileChooser("./");
+        fileChooser.setCurrentDirectory(new java.io.File("."));
+        fileChooser.setDialogTitle("Find Folder");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false);
 
         //Setting up JPanel
         panel = new JPanel(new FlowLayout());
