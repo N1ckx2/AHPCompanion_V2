@@ -9,6 +9,7 @@ import java.util.Calendar;
 /**
  * Created by Nicholas Vadivelu on 2016-07-27.
  */
+
 public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeListener {
     private JPanel panel;
     private JTextField sourceText, destText, storagePathText;
@@ -46,7 +47,7 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
         ssfCombo.addItem("Auto");
 
         //fill text fields with destinations
-        updateTextFields();
+        updateComponents();
 
         //set up action listener
         settingsBtn.addActionListener(this);
@@ -66,16 +67,32 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
             if (e.getSource() == moveBtn) {
                 //Will be used to check if move worked
                 boolean success = false;
+
+                //Moving scans
                 if (scanOrImg.getSelectedItem().equals("Scans")) {
-                    success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue());
-                } else if (scanOrImg.getSelectedItem().equals("Images")) {
-                    success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue());
+                    if (ssiCombo.getSelectedItem().equals("Auto")) //completely automatic
+                        success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue());
+                    else if (ssfCombo.getSelectedItem().equals("Auto")) //defined start position
+                        success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem());
+                    else //both positions defined
+                        success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem(), (Integer) ssfCombo.getSelectedItem());
+                }
+
+                //Moving Images
+                else if (scanOrImg.getSelectedItem().equals("Images")) {
+                    if (ssiCombo.getSelectedItem().equals("Auto")) //completely automatic
+                        success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue());
+                    else if (ssfCombo.getSelectedItem().equals("Auto")) //defined start position
+                        success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem());
+                    else //both positions defined
+                        success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem(), (Integer) ssfCombo.getSelectedItem());
                 }
 
                 //If it worked, tell user. If it didn't work, an error dialogue should have popped up.
                 if (success) {
                     JOptionPane.showMessageDialog(this, "Moved!", "Move Successful", JOptionPane.INFORMATION_MESSAGE);
                 }
+
             } else if (e.getSource() == settingsBtn) {
                 setVisible(false);
                 new EditConfig(main.getConfig(), this); //opens up edit configuartion
@@ -84,22 +101,32 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
             setVisible(false);
             new EditConfig(main.getConfig(), this); //opens up edit configuartion
         }
-        updateTextFields();
+        updateComponents();
     }
 
     public void stateChanged (ChangeEvent e) {
-        updateTextFields();
+        updateComponents();
     }
 
-    public void updateTextFields() {
+    public void updateComponents() {
         if (scanOrImg.getSelectedItem().equals("Scans")) {
-            sourceText.setText(config.loadConfiguration("sourcePath") + "\\Scans\\FIT1");
+            sourceText.setText(config.loadConfiguration("sourcePath") + "\\Scans\\FIT" + gSpinner.getValue());
             destText.setText(config.loadConfiguration("ahpdataPath") + "\\AP" + apSpinner.getValue() + "\\FIT" + gSpinner.getValue() + "\\T" + tSpinner.getValue() + "\\SS1\\Scans");
-            storagePathText.setText(config.loadConfiguration("usbPath") + "FIT1");
+            storagePathText.setText(config.loadConfiguration("usbPath") + "FIT"+gSpinner.getValue());
         } else if (scanOrImg.getSelectedItem().equals("Images")) {
-            sourceText.setText(config.loadConfiguration("sourcePath") + "\\Images\\FIT 1");
+            sourceText.setText(config.loadConfiguration("sourcePath") + "\\Images\\FIT" + gSpinner.getValue());
             destText.setText(config.loadConfiguration("ahpdataPath") + "\\AP" + apSpinner.getValue() + "\\FIT" + gSpinner.getValue() + "\\T" + tSpinner.getValue() + "\\SS1\\Images");
             storagePathText.setText(config.loadConfiguration("sdPath") + "DCIM");
+        }
+
+        int[] ss = main.getSSNums((Integer)tSpinner.getValue(), (Integer) gSpinner.getValue());
+        ssiCombo.removeAllItems();
+        ssfCombo.removeAllItems();
+        ssiCombo.addItem("Auto");
+        ssfCombo.addItem("Auto");
+        for (int i = 0 ; i < ss.length ; i++){
+            ssiCombo.addItem(""+ss[i]);
+            ssfCombo.addItem(""+ss[i]);
         }
     }
 

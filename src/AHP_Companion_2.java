@@ -22,7 +22,8 @@ public class AHP_Companion_2 {
     private Configuration config; //XML file used to store path data
     private AHPCompanion2_GUI gui;
 
-    final private int[][] NUM_STATIONS = { //[fit][traverse], leading zeros so indexing isn't weird
+    /* No longer relevant due to the getSSNums method
+     final private int[][] NUM_STATIONS = { //[fit][traverse], leading zeros so indexing isn't weird
             {0, 0, 0, 0}, //empty
             {0, 1, 5, 4}, //FIT 1: 10 SS
             {0, 1, 4, 8}, //FIT 2: 13 SS
@@ -30,7 +31,7 @@ public class AHP_Companion_2 {
             {0, 1, 5, 5}, //FIT 4: 14 SS
             {0, 1, 7, 4}, //FIT 5: 12 SS
             {0, 1, 8, 5}, //FIT 6: 14 SS
-    };
+    }; */
 
     public AHP_Companion_2(AHPCompanion2_GUI g) {
         gui = g; //local version of gui to manipulate
@@ -39,9 +40,33 @@ public class AHP_Companion_2 {
         expedition = Calendar.getInstance().get(Calendar.YEAR) - 1999; //AP number based on the current year
     }
 
+    public int[] getSSNums (int traverse, int fit) { //get number of sample stations
+        String path = ahpdataPath + "\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse;
+
+        File file = new File(path);
+        File[] scans = file.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory();
+            }
+        });
+
+        int[] ssNums = new int[scans.length-1];
+        for (int i = 1 ; i < scans.length; i++){ //starts at 1 to avoid the data folder
+            ssNums[i-1] = scans[i].toString().charAt(scans[i].toString().length()-1)-'0';
+        }
+
+        return ssNums;
+    }
+
     public boolean moveScans(int traverse, int fit) {
         int[] ss = getSSNums(traverse, fit);
         return moveScans(traverse, fit, ss[0], ss[ss.length-1]);
+    }
+
+    public boolean moveScans(int traverse, int fit, int ssi) {
+        int[] ss = getSSNums(traverse, fit);
+        return moveScans(traverse, fit, ssi, ss[ss.length-1]);
     }
 
     public boolean moveScans(int traverse, int fit, int ssi, int ssf) {
@@ -77,28 +102,14 @@ public class AHP_Companion_2 {
         return true;
     }
 
-    public int[] getSSNums (int traverse, int fit) { //get number of sample stations
-        String path = ahpdataPath + "\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse;
-
-        File file = new File(path);
-        File[] scans = file.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return f.isDirectory();
-            }
-        });
-
-        int[] ssNums = new int[scans.length];
-        for (int i = 0 ; i < scans.length ; i++){
-            ssNums[i] = scans[i].toString().charAt(scans[i].toString().length()-1)-'0';
-        }
-
-        return ssNums;
-    }
-
     public boolean moveImages(int traverse, int fit) {
         int[] ss = getSSNums(fit, traverse);
         return moveImages(traverse, fit, ss[0], ss[ss.length-1]);
+    }
+
+    public boolean moveImages(int traverse, int fit, int ssi) {
+        int[] ss = getSSNums(fit, traverse);
+        return moveImages(traverse, fit, ssi, ss[ss.length-1]);
     }
 
     public boolean moveImages(int traverse, int fit, int ssi, int ssf) {
@@ -183,7 +194,6 @@ public class AHP_Companion_2 {
             usbPath = config.loadConfiguration("usbPath");
             sdPath = config.loadConfiguration("sdPath"); //tries to retrive values from the config.xml for these paths
             if (ahpdataPath.equals("") || storagePath.equals("") || usbPath.equals("") || sdPath.equals("")) { //if any of these are blank, prompt user with EditConfig
-                System.out.println("false");
                 gui.setVisible(false);
                 new EditConfig(config, gui);
                 return false;
