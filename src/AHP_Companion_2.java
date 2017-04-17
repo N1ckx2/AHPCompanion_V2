@@ -1,4 +1,8 @@
+import com.sun.javafx.image.IntPixelGetter;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,12 +10,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Calendar;
+import java.util.LinkedList;
 
 /**
  * Created by Nicholas Vadivelu on 2016-07-26.
  */
 public class AHP_Companion_2 {
-    private String programPath, storagePath, usbPath, sdPath;
+    private String ahpdataPath, storagePath, usbPath, sdPath;
     private int expedition;
     private Configuration config; //XML file used to store path data
     private AHPCompanion2_GUI gui;
@@ -36,7 +41,7 @@ public class AHP_Companion_2 {
     public boolean moveScans(int traverse, int fit) {
         //Establishes source nad destination paths
         String ssrfPath = storagePath + "\\Scans\\FIT " + fit;
-        String destPath = programPath + "\\AHPDATA\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
+        String destPath = ahpdataPath + "\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
 
         File[] scans = new File(ssrfPath).listFiles(); //retrieves files
 
@@ -57,11 +62,11 @@ public class AHP_Companion_2 {
         return true;
     }
 
-
+    /*
     public boolean moveImages(int traverse, int fit) {
         //Establishes source nad destination paths
         String imagePath = storagePath + "\\Images\\FIT " + fit;
-        String destPath = programPath + "\\AHPDATA\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
+        String destPath = ahpdataPath + "\\AHPDATA\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
 
         File[] images = new File(imagePath).listFiles();//retrieves files
 
@@ -88,6 +93,57 @@ public class AHP_Companion_2 {
         }
 
         return true;
+    }*/
+
+    public boolean moveImages(int traverse, int fit) {
+        //Establishes source nad destination path
+        String imagePath = storagePath + "\\Images\\FIT " + fit;
+        String destPath = ahpdataPath + "\\AHPDATA\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
+
+        File[] images = new File(imagePath).listFiles(); //retrieves files
+        int[] blackimgs = getBlack(images);
+
+        //move images
+        for (int i = 0 ; i < blackimgs.length-1; i++ ) {
+            for (int j = blackimgs[i] ; j < blackimgs[i+1] ; i++)
+                copyFile(images[j], destPath + (i+1), images[j].toString());
+        }
+        for (int j = blackimgs[blackimgs.length-2] ; j < images.length ; j++)
+            copyFile(images[j], destPath + (blackimgs.length-1), images[j].toString());
+
+        return true;
+    }
+
+    private int[] getBlack (File[] images) {
+        LinkedList<Integer> inds = new LinkedList<>();
+        inds.add(0);
+
+        for (int i = 0 ; i < images.length ; i++) {
+            BufferedImage img = null;
+            double avg = 0; //average rgb value
+
+            try {
+                img = ImageIO.read(images[i]); //reads in the image
+                for (int j = 0 ; j < img.getHeight(); j++) { //goes through all the pixels
+                    for (int k = 0 ; k < img.getWidth() ; k ++) {
+                        avg += img.getRGB(k, j); //summs of rgb values
+                    }
+                }
+                avg /= img.getHeight()*img.getWidth(); //finds average rgb value
+            } catch (IOException e) {
+                avg = Integer.MAX_VALUE; //if image loading failed, set aveage to MAX;
+            }
+
+            if (avg < 10)
+                inds.add(i); //adds image if it's black
+        }
+
+        int[] imgs = new int[inds.size()];
+        int count = 0;
+        for (int i : inds) {
+            imgs[count++] = i;
+        }
+        return imgs;
     }
 
     private static void copyFile(File source, String destPath, String name){ //Moves files from source to destPath
@@ -104,11 +160,11 @@ public class AHP_Companion_2 {
 
     public boolean checkConfig () {
         try {
-            programPath = config.loadConfiguration("ahpdataPath");
+            ahpdataPath = config.loadConfiguration("ahpdataPath");
             storagePath = config.loadConfiguration("sourcePath");
             usbPath = config.loadConfiguration("usbPath");
             sdPath = config.loadConfiguration("sdPath"); //tries to retrive values from the config.xml for these paths
-            if (programPath.equals("") || storagePath.equals("") || usbPath.equals("") || sdPath.equals("")) { //if any of these are blank, prompt user with EditConfig
+            if (ahpdataPath.equals("") || storagePath.equals("") || usbPath.equals("") || sdPath.equals("")) { //if any of these are blank, prompt user with EditConfig
                 System.out.println("false");
                 gui.setVisible(false);
                 new EditConfig(config, gui);

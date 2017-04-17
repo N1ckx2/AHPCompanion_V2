@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>AHP_Companion_2Configuration File</comment>
+<entry key="ahpdataPath">C:\Users\Nick\Desktop\Algonquin\AHPDATA</entry>
+<entry key="usbPath">G:\</entry>
+<entry key="sourcePath">C:\Users\Nick\Desktop\Algonquin\Source Folder</entry>
+<entry key="sdPath">F:\</entry>
+<entry key="Initializer">1</entry>
+</properties>

@@ -1,5 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
@@ -7,13 +9,11 @@ import java.util.Calendar;
 /**
  * Created by Nicholas Vadivelu on 2016-07-27.
  */
-public class AHPCompanion2_GUI extends JFrame implements ActionListener {
+public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeListener {
     private JPanel panel;
     private JTextField sourceText, destText, storagePathText;
-    private JLabel apLabel, gLabel, tLabel, destPathLabel, sourcePathLabel;
+    private JLabel apLabel, gLabel, tLabel, destPathLabel, sourcePathLabel, storagePathLabel;
     private JSpinner apSpinner, gSpinner, tSpinner;
-    private JLabel storagePathLabel;
-    private JTextField traverse, fit;
     private JComboBox<String> scanOrImg;
     private JButton moveBtn, settingsBtn;
     private AHP_Companion_2 main;
@@ -28,18 +28,23 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener {
         }
         main = new AHP_Companion_2(this);
         config = main.getConfig();
-        //setting up components
+
+        //setting up spinners
         int exp = Calendar.getInstance().get(Calendar.YEAR) - 1999; //expedition number
         apSpinner.setModel(new SpinnerNumberModel(exp, 8, exp, 1));
         gSpinner.setModel(new SpinnerNumberModel(1, 1, 6, 1));
         tSpinner.setModel(new SpinnerNumberModel(0, 0, 3, 1));
+        apSpinner.addChangeListener(this);
+        gSpinner.addChangeListener(this);
+        tSpinner.addChangeListener(this);
+
+        //setting up combobox
         scanOrImg.addItem("Scans");
         scanOrImg.addItem("Images");
+        scanOrImg.addActionListener(this);
 
         //fill text fields with destinations
-        sourceText.setText(config.loadConfiguration("sourcePath") + "\\FIT 1");
-        destText.setText(config.loadConfiguration("ahpdataPath") + "\\AP" + apSpinner.getValue() + "\\FIT"+ gSpinner.getValue() + "\\T" + tSpinner.getValue() + "\\SS1\\Scans");
-        storagePathText.setText(config.loadConfiguration("usbPath") + "FIT 1");
+        updateTextFields();
 
         //set up action listener
         settingsBtn.addActionListener(this);
@@ -60,22 +65,39 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener {
                 //Will be used to check if move worked
                 boolean success = false;
                 if (scanOrImg.getSelectedItem().equals("Scans")) {
-                    success = main.moveScans(Integer.parseInt(traverse.getText()), Integer.parseInt(fit.getText()));
+                    success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue());
                 } else if (scanOrImg.getSelectedItem().equals("Images")) {
-                    success = main.moveImages(Integer.parseInt(traverse.getText()), Integer.parseInt(fit.getText()));
+                    success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue());
                 }
 
                 //If it worked, tell user. If it didn't work, an error dialogue should have popped up.
                 if (success) {
                     JOptionPane.showMessageDialog(this, "Moved!", "Move Successful", JOptionPane.INFORMATION_MESSAGE);
                 }
-            } else if (e.getActionCommand().equals("Settings")) {
+            } else if (e.getSource() == settingsBtn) {
                 setVisible(false);
                 new EditConfig(main.getConfig(), this); //opens up edit configuartion
             }
         } else if (e.getSource() == settingsBtn) {
             setVisible(false);
             new EditConfig(main.getConfig(), this); //opens up edit configuartion
+        }
+        updateTextFields();
+    }
+
+    public void stateChanged (ChangeEvent e) {
+        updateTextFields();
+    }
+
+    public void updateTextFields() {
+        if (scanOrImg.getSelectedItem().equals("Scans")) {
+            sourceText.setText(config.loadConfiguration("sourcePath") + "\\Scans\\FIT1");
+            destText.setText(config.loadConfiguration("ahpdataPath") + "\\AP" + apSpinner.getValue() + "\\FIT" + gSpinner.getValue() + "\\T" + tSpinner.getValue() + "\\SS1\\Scans");
+            storagePathText.setText(config.loadConfiguration("usbPath") + "FIT1");
+        } else if (scanOrImg.getSelectedItem().equals("Images")) {
+            sourceText.setText(config.loadConfiguration("sourcePath") + "\\Images\\FIT 1");
+            destText.setText(config.loadConfiguration("ahpdataPath") + "\\AP" + apSpinner.getValue() + "\\FIT" + gSpinner.getValue() + "\\T" + tSpinner.getValue() + "\\SS1\\Images");
+            storagePathText.setText(config.loadConfiguration("sdPath") + "DCIM");
         }
     }
 

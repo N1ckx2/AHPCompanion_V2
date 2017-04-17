@@ -104,25 +104,25 @@ public class EditConfig extends JFrame implements ActionListener {
             fileChooser.setVisible(true);
             int choice = fileChooser.showOpenDialog(this); //open the folder chooser
             if (choice == JFileChooser.APPROVE_OPTION){
-                programPath.setText(fileChooser.getCurrentDirectory().toString());
+                programPath.setText(fileChooser.getSelectedFile().toString());
             }
         } else if (e.getSource() == browseStoragePath) {
             fileChooser.setVisible(true);
             int choice = fileChooser.showOpenDialog(this); //open the folder chooser
             if (choice == JFileChooser.APPROVE_OPTION){
-                sourcePath.setText(fileChooser.getCurrentDirectory().toString());
+                sourcePath.setText(fileChooser.getSelectedFile().toString());
             }
         } else if (e.getSource() == browseUSBPath) {
             fileChooser.setVisible(true);
             int choice = fileChooser.showOpenDialog(this); //open the folder chooser
             if (choice == JFileChooser.APPROVE_OPTION){
-                usbPath.setText(fileChooser.getCurrentDirectory().toString());
+                usbPath.setText(fileChooser.getSelectedFile().toString());
             }
         } else if (e.getSource() == browseSDPath) {
             fileChooser.setVisible(true);
             int choice = fileChooser.showOpenDialog(this); //open the folder chooser
             if (choice == JFileChooser.APPROVE_OPTION){
-                sdPath.setText(fileChooser.getCurrentDirectory().toString());
+                sdPath.setText(fileChooser.getSelectedFile().toString());
             }
         }
     }
