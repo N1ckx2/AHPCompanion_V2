@@ -14,7 +14,7 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
     private JTextField sourceText, destText, storagePathText;
     private JLabel apLabel, gLabel, tLabel, destPathLabel, sourcePathLabel, storagePathLabel;
     private JSpinner apSpinner, gSpinner, tSpinner;
-    private JComboBox<String> scanOrImg;
+    private JComboBox<String> scanOrImg, ssiCombo, ssfCombo;
     private JButton moveBtn, settingsBtn;
     private AHP_Companion_2 main;
     private Configuration config;
@@ -38,10 +38,12 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
         gSpinner.addChangeListener(this);
         tSpinner.addChangeListener(this);
 
-        //setting up combobox
+        //setting up comboboxes
         scanOrImg.addItem("Scans");
         scanOrImg.addItem("Images");
         scanOrImg.addActionListener(this);
+        ssiCombo.addItem("Auto");
+        ssfCombo.addItem("Auto");
 
         //fill text fields with destinations
         updateTextFields();

@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,77 +40,94 @@ public class AHP_Companion_2 {
     }
 
     public boolean moveScans(int traverse, int fit) {
-        //Establishes source nad destination paths
-        String ssrfPath = storagePath + "\\Scans\\FIT " + fit;
-        String destPath = ahpdataPath + "\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
+        int[] ss = getSSNums(traverse, fit);
+        return moveScans(traverse, fit, ss[0], ss[ss.length-1]);
+    }
 
-        File[] scans = new File(ssrfPath).listFiles(); //retrieves files
+    public boolean moveScans(int traverse, int fit, int ssi, int ssf) {
+        //Establishes source nad destination paths
+        String ssrfPath = storagePath + "\\Scans\\T"+traverse+"\\FIT" + fit;
+        String destPath = ahpdataPath + "\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
+        String USBsource = usbPath + "\\FIT" + fit;
+
+        File[] scans = new File(USBsource).listFiles(); //retrieves files
 
         //Make sure the number of files is correct, and if not don't proceed
+        /*
         if (scans.length/4 != NUM_STATIONS[fit][traverse]) {
-            JOptionPane.showMessageDialog(gui, "" +scans.length/4 + " sample stations found, but there should be " + NUM_STATIONS[fit][traverse], "Error", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(gui, "" +scans.length/4 + " sample stations found, but there should be " + getSSNums(fit, traverse).length, "Error", JOptionPane.WARNING_MESSAGE);
             return false;
-        }
+        }*/
 
         //Moves files into appropriate folders based on GTS
-        for (int i = 1 ; i <= scans.length/4 ; i++) {
-            copyFile(scans[(i-1)*4], destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"wd.jpg");
-            copyFile(scans[(i-1)*4+1],   destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"sm.jpg");
-            copyFile(scans[(i-1)*4+2], destPath + i + "\\Scans\\FDS",      "" + expedition+traverse+fit+(i)+"1.jpg");
-            copyFile(scans[(i-1)*4+3], destPath + i + "\\Scans\\FDS",      "" + expedition+traverse+fit+(i)+"2.jpg"); //add double slash in maybe
+        for (int i = ssi ; i <= ssf ; i++) {
+            //into storage folder
+            copyFile(scans[(i-ssi-1)*4], ssrfPath, "" + expedition+traverse+fit+(i)+"wd.jpg");
+            copyFile(scans[(i-ssi-1)*4+1],   ssrfPath, "" + expedition+traverse+fit+(i)+"sm.jpg");
+            copyFile(scans[(i-ssi-1)*4+2], ssrfPath,      "" + expedition+traverse+fit+(i)+"1.jpg");
+            copyFile(scans[(i-ssi-1)*4+3], ssrfPath,      "" + expedition+traverse+fit+(i)+"2.jpg"); //add double slash in maybe
+
+            //into AHP data
+            copyFile(scans[(i-ssi-1)*4], destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"wd.jpg");
+            copyFile(scans[(i-ssi-1)*4+1],   destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"sm.jpg");
+            copyFile(scans[(i-ssi-1)*4+2], destPath + i + "\\Scans\\FDS",      "" + expedition+traverse+fit+(i)+"1.jpg");
+            copyFile(scans[(i-ssi-1)*4+3], destPath + i + "\\Scans\\FDS",      "" + expedition+traverse+fit+(i)+"2.jpg"); //add double slash in maybe
         }
 
         return true;
     }
 
-    /*
-    public boolean moveImages(int traverse, int fit) {
-        //Establishes source nad destination paths
-        String imagePath = storagePath + "\\Images\\FIT " + fit;
-        String destPath = ahpdataPath + "\\AHPDATA\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
+    public int[] getSSNums (int traverse, int fit) { //get number of sample stations
+        String path = ahpdataPath + "\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse;
 
-        File[] images = new File(imagePath).listFiles();//retrieves files
-
-        //Counts the number of black images in the folder (indicates the end of images from one SS)
-        int numBlack = 0;
-        for (int i = 0 ; i < images.length ; i++){
-            if (images[i].toString().substring(images[i].toString().length()-5).toUpperCase().equals("B.JPG")){
-                numBlack++;
+        File file = new File(path);
+        File[] scans = file.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory();
             }
+        });
+
+        int[] ssNums = new int[scans.length];
+        for (int i = 0 ; i < scans.length ; i++){
+            ssNums[i] = scans[i].toString().charAt(scans[i].toString().length()-1)-'0';
         }
 
-        //If the number of black images doesn't match what was expected, tell user
-        if (numBlack != NUM_STATIONS[fit][traverse]) {
-            JOptionPane.showMessageDialog(gui, "" + numBlack + " black images found, but there should be " + NUM_STATIONS[fit][traverse], "Error", JOptionPane.WARNING_MESSAGE);
-            return false;
-        }
-
-        //Move files to appropriate locations, using the black images as markers
-        for (int i = 1, j = 0; i <= numBlack && j < images.length ; i++, j++) {
-            while (!images[j].toString().substring(images[j].toString().length()-5).toUpperCase().equals("B.JPG")){
-                copyFile(images[j], destPath + i + "\\Images\\RAW", destPath + i + "\\Images\\RAW\\" + images[j].getName());
-                j++;
-            }
-        }
-
-        return true;
-    }*/
+        return ssNums;
+    }
 
     public boolean moveImages(int traverse, int fit) {
+        int[] ss = getSSNums(fit, traverse);
+        return moveImages(traverse, fit, ss[0], ss[ss.length-1]);
+    }
+
+    public boolean moveImages(int traverse, int fit, int ssi, int ssf) {
         //Establishes source nad destination path
-        String imagePath = storagePath + "\\Images\\FIT " + fit;
+        String source = sdPath + "\\DCIM";
+        String imagePath = storagePath + "\\Images\\FIT" + fit;
         String destPath = ahpdataPath + "\\AHPDATA\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
 
-        File[] images = new File(imagePath).listFiles(); //retrieves files
+        File[] images = new File(source).listFiles(); //retrieves files
         int[] blackimgs = getBlack(images);
 
-        //move images
-        for (int i = 0 ; i < blackimgs.length-1; i++ ) {
-            for (int j = blackimgs[i] ; j < blackimgs[i+1] ; i++)
-                copyFile(images[j], destPath + (i+1), images[j].toString());
+        //move photos to storage directory
+        for (int i = 0 ; i < images.length ; i++){
+            copyFile(images[i], imagePath, images[i].toString());
         }
-        for (int j = blackimgs[blackimgs.length-2] ; j < images.length ; j++)
-            copyFile(images[j], destPath + (blackimgs.length-1), images[j].toString());
+
+        //move images to ahp data
+        for (int i = 0 ; i < blackimgs.length-1; i++ ) {
+            for (int j = blackimgs[i] ; j < blackimgs[i+1] ; i++) {
+                copyFile(images[j], destPath + ssi++, images[j].toString());
+            }
+        }
+        for (int j = blackimgs[blackimgs.length-1] ; j < images.length ; j++) {
+            copyFile(images[j], destPath + ssi, images[j].toString());
+        }
+        if (ssi != ssf) { //checks to make sure the desired sample stations were covered
+            JOptionPane.showMessageDialog(gui, "Error moving photos", "Error", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
 
         return true;
     }
