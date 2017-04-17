@@ -11,7 +11,7 @@ import java.util.Calendar;
  * Created by Nicholas Vadivelu on 2016-07-26.
  */
 public class AHP_Companion_2 {
-    private String programPath, storagePath, usbPath;
+    private String programPath, storagePath, usbPath, sdPath;
     private int expedition;
     private Configuration config; //XML file used to store path data
     private AHPCompanion2_GUI gui;
@@ -104,10 +104,12 @@ public class AHP_Companion_2 {
 
     public boolean checkConfig () {
         try {
-            programPath = config.loadConfiguration("programPath");
-            storagePath = config.loadConfiguration("storagePath");
-            usbPath = config.loadConfiguration("usbPath"); //tries to retrive values from the config.xml for these paths
-            if (programPath.equals("") || storagePath.equals("") || usbPath.equals("")) { //if any of these are blank, prompt user with EditConfig
+            programPath = config.loadConfiguration("ahpdataPath");
+            storagePath = config.loadConfiguration("sourcePath");
+            usbPath = config.loadConfiguration("usbPath");
+            sdPath = config.loadConfiguration("sdPath"); //tries to retrive values from the config.xml for these paths
+            if (programPath.equals("") || storagePath.equals("") || usbPath.equals("") || sdPath.equals("")) { //if any of these are blank, prompt user with EditConfig
+                System.out.println("false");
                 gui.setVisible(false);
                 new EditConfig(config, gui);
                 return false;
@@ -121,4 +123,5 @@ public class AHP_Companion_2 {
     }
 
     public Configuration getConfig() { return config; }
+    public int getExpedition() {return expedition;}
 }
