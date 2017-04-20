@@ -4,7 +4,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Calendar;
+
+import static java.awt.SystemColor.window;
 
 /**
  * Created by Nicholas Vadivelu on 2016-07-27.
@@ -18,6 +21,7 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
     private JComboBox<String> scanOrImg, ssiCombo, ssfCombo;
     private JButton moveBtn, settingsBtn;
     private AHP_Companion_2 main;
+    private JFileChooser fileChooser;
     private Configuration config;
 
     public AHPCompanion2_GUI () {
@@ -29,6 +33,9 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
         }
         main = new AHP_Companion_2(this);
         config = main.getConfig();
+
+        fileChooser = new JFileChooser("./");
+        fileChooser.setMultiSelectionEnabled(true); //allows selection of multiple images
 
         //setting up spinners
         int exp = Calendar.getInstance().get(Calendar.YEAR) - 1999; //expedition number
@@ -79,13 +86,32 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
                 }
 
                 //Moving Images
-                else if (scanOrImg.getSelectedItem().equals("Images")) {
+                else if (scanOrImg.getSelectedItem().equals("Images")) { //opens a file chooser and allows user to select images on sample station at a time
+                    fileChooser.setCurrentDirectory(new File(storagePathText.getText()));
+                    int[] ss = main.getSSNums((Integer)tSpinner.getValue(), (Integer) gSpinner.getValue());
+                    String directory = "";
+                    success = true;
+                    for (int i = 0 ; i < ss.length; i++) {
+                        fileChooser.setDialogTitle("Sample Station " + ss[i]);
+                        int returnVal = fileChooser.showOpenDialog(this);
+                        if (returnVal == JFileChooser.APPROVE_OPTION){
+                            success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), ss[i], fileChooser.getSelectedFiles());
+                            directory = fileChooser.getCurrentDirectory().toString();
+                        }
+                    }
+
+                    //backs up all the transfered images
+                    if (!directory.equals(""))
+                        success = main.backUp((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), directory);
+
+                    /* Code no longer useful after new implementation of moveImages
                     if (ssiCombo.getSelectedItem().equals("Auto")) //completely automatic
                         success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue());
                     else if (ssfCombo.getSelectedItem().equals("Auto")) //defined start position
                         success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem());
                     else //both positions defined
                         success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem(), (Integer) ssfCombo.getSelectedItem());
+                        */
                 }
 
                 //If it worked, tell user. If it didn't work, an error dialogue should have popped up.
@@ -124,7 +150,7 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
         ssfCombo.removeAllItems();
         ssiCombo.addItem("Auto");
         ssfCombo.addItem("Auto");
-        for (int i = 0 ; i < ss.length ; i++){
+        for (int i = 0 ; i < ss.length && scanOrImg.getSelectedItem().equals("Scans"); i++){
             ssiCombo.addItem(""+ss[i]);
             ssfCombo.addItem(""+ss[i]);
         }

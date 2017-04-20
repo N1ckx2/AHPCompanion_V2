@@ -102,6 +102,62 @@ public class AHP_Companion_2 {
         return true;
     }
 
+    public boolean moveImages (int traverse, int fit, int ss, File[] images) {
+        String destPath = ahpdataPath + "\\AHPDATA\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS" + ss;
+        for (File f : images)
+            copyFile(f, destPath, f.getName());
+        return true;
+    }
+
+    public boolean backUp (int traverse, int fit, String directory) {
+        //Backs up files
+        String imagePath = storagePath + "\\Images\\FIT" + fit;
+
+        File[] images = new File(directory).listFiles(); //retrieves all files in that folder
+        //move photos to storage directory
+        for (int i = 0 ; i < images.length ; i++){
+            copyFile(images[i], imagePath, images[i].getName());
+        }
+        return true;
+    }
+
+    private static void copyFile(File source, String destPath, String name){ //Moves files from source to destPath
+        Path src = Paths.get(source.toString()); //original file
+        Path targetDir = Paths.get(destPath.toString());
+        try {
+            Files.createDirectories(targetDir); //in case target directory didn't exist
+            Path target = targetDir.resolve(name); //create new path with destName
+            Files.copy(src, target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean checkConfig () {
+        try {
+            ahpdataPath = config.loadConfiguration("ahpdataPath");
+            storagePath = config.loadConfiguration("sourcePath");
+            usbPath = config.loadConfiguration("usbPath");
+            sdPath = config.loadConfiguration("sdPath"); //tries to retrive values from the config.xml for these paths
+            if (ahpdataPath.equals("") || storagePath.equals("") || usbPath.equals("") || sdPath.equals("")) { //if any of these are blank, prompt user with EditConfig
+                gui.setVisible(false);
+                new EditConfig(config, gui);
+                return false;
+            }
+        } catch (NullPointerException e) { //inevitable, if the xml doesn't exist, a Nullpointer will be thrown, in which case do the same thing in the if statement
+            gui.setVisible(false);
+            new EditConfig(config, gui);
+            return false;
+        }
+        return true;
+    }
+
+    public Configuration getConfig() { return config; }
+    public int getExpedition() {return expedition;}
+
+
+    //Code below no longer useful due to the new implementation of moveImages
+        /*
     public boolean moveImages(int traverse, int fit) {
         int[] ss = getSSNums(fit, traverse);
         return moveImages(traverse, fit, ss[0], ss[ss.length-1]);
@@ -173,39 +229,5 @@ public class AHP_Companion_2 {
             imgs[count++] = i;
         }
         return imgs;
-    }
-
-    private static void copyFile(File source, String destPath, String name){ //Moves files from source to destPath
-        Path src = Paths.get(source.toString()); //original file
-        Path targetDir = Paths.get(destPath.toString());
-        try {
-            Files.createDirectories(targetDir); //in case target directory didn't exist
-            Path target = targetDir.resolve(name); //create new path with destName
-            Files.copy(src, target, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public boolean checkConfig () {
-        try {
-            ahpdataPath = config.loadConfiguration("ahpdataPath");
-            storagePath = config.loadConfiguration("sourcePath");
-            usbPath = config.loadConfiguration("usbPath");
-            sdPath = config.loadConfiguration("sdPath"); //tries to retrive values from the config.xml for these paths
-            if (ahpdataPath.equals("") || storagePath.equals("") || usbPath.equals("") || sdPath.equals("")) { //if any of these are blank, prompt user with EditConfig
-                gui.setVisible(false);
-                new EditConfig(config, gui);
-                return false;
-            }
-        } catch (NullPointerException e) { //inevitable, if the xml doesn't exist, a Nullpointer will be thrown, in which case do the same thing in the if statement
-            gui.setVisible(false);
-            new EditConfig(config, gui);
-            return false;
-        }
-        return true;
-    }
-
-    public Configuration getConfig() { return config; }
-    public int getExpedition() {return expedition;}
+    } */
 }
