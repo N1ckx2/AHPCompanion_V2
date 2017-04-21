@@ -22,17 +22,6 @@ public class AHP_Companion_2 {
     private Configuration config; //XML file used to store path data
     private AHPCompanion2_GUI gui;
 
-    /* No longer relevant due to the getSSNums method
-     final private int[][] NUM_STATIONS = { //[fit][traverse], leading zeros so indexing isn't weird
-            {0, 0, 0, 0}, //empty
-            {0, 1, 5, 4}, //FIT 1: 10 SS
-            {0, 1, 4, 8}, //FIT 2: 13 SS
-            {0, 1, 6, 6}, //FIT 3: 13 SS
-            {0, 1, 5, 5}, //FIT 4: 14 SS
-            {0, 1, 7, 4}, //FIT 5: 12 SS
-            {0, 1, 8, 5}, //FIT 6: 14 SS
-    }; */
-
     public AHP_Companion_2(AHPCompanion2_GUI g) {
         gui = g; //local version of gui to manipulate
         config = new Configuration("AHP_Companion_2", "config.xml"); //configuration file to get data
@@ -85,25 +74,26 @@ public class AHP_Companion_2 {
         }*/
 
         //Moves files into appropriate folders based on GTS
+        int counter = 0; //to iterate through properly
         for (int i = ssi ; i <= ssf ; i++) {
             //into storage folder
-            copyFile(scans[(i-ssi-1)*4], ssrfPath, "" + expedition+traverse+fit+(i)+"wd.jpg");
-            copyFile(scans[(i-ssi-1)*4+1],   ssrfPath, "" + expedition+traverse+fit+(i)+"sm.jpg");
-            copyFile(scans[(i-ssi-1)*4+2], ssrfPath,      "" + expedition+traverse+fit+(i)+"1.jpg");
-            copyFile(scans[(i-ssi-1)*4+3], ssrfPath,      "" + expedition+traverse+fit+(i)+"2.jpg"); //add double slash in maybe
+            copyFile(scans[counter], ssrfPath, "" + expedition+traverse+fit+(i)+"wd.jpg");
+            copyFile(scans[counter+1],   ssrfPath, "" + expedition+traverse+fit+(i)+"sm.jpg");
+            copyFile(scans[counter+2], ssrfPath,      "" + expedition+traverse+fit+(i)+"1.jpg");
+            copyFile(scans[counter+3], ssrfPath,      "" + expedition+traverse+fit+(i)+"2.jpg"); //add double slash in maybe
 
             //into AHP data
-            copyFile(scans[(i-ssi-1)*4], destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"wd.jpg");
-            copyFile(scans[(i-ssi-1)*4+1],   destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"sm.jpg");
-            copyFile(scans[(i-ssi-1)*4+2], destPath + i + "\\Scans\\FDS",      "" + expedition+traverse+fit+(i)+"1.jpg");
-            copyFile(scans[(i-ssi-1)*4+3], destPath + i + "\\Scans\\FDS",      "" + expedition+traverse+fit+(i)+"2.jpg"); //add double slash in maybe
+            copyFile(scans[counter++], destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"wd.jpg");
+            copyFile(scans[counter++],   destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"sm.jpg");
+            copyFile(scans[counter++], destPath + i + "\\Scans\\FDS",      "" + expedition+traverse+fit+(i)+"1.jpg");
+            copyFile(scans[counter++], destPath + i + "\\Scans\\FDS",      "" + expedition+traverse+fit+(i)+"2.jpg"); //add double slash in maybe
         }
 
         return true;
     }
 
     public boolean moveImages (int traverse, int fit, int ss, File[] images) {
-        String destPath = ahpdataPath + "\\AHPDATA\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS" + ss;
+        String destPath = ahpdataPath + "\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS" + ss + "\\Images\\RAW";
         for (File f : images)
             copyFile(f, destPath, f.getName());
         return true;
@@ -111,7 +101,7 @@ public class AHP_Companion_2 {
 
     public boolean backUp (int traverse, int fit, String directory) {
         //Backs up files
-        String imagePath = storagePath + "\\Images\\FIT" + fit;
+        String imagePath = storagePath + "\\Images\\T" + traverse + "\\FIT" + fit;
 
         File[] images = new File(directory).listFiles(); //retrieves all files in that folder
         //move photos to storage directory
@@ -122,6 +112,8 @@ public class AHP_Companion_2 {
     }
 
     private static void copyFile(File source, String destPath, String name){ //Moves files from source to destPath
+        //System.out.println(destPath + " " + name);
+
         Path src = Paths.get(source.toString()); //original file
         Path targetDir = Paths.get(destPath.toString());
         try {
@@ -154,80 +146,4 @@ public class AHP_Companion_2 {
 
     public Configuration getConfig() { return config; }
     public int getExpedition() {return expedition;}
-
-
-    //Code below no longer useful due to the new implementation of moveImages
-        /*
-    public boolean moveImages(int traverse, int fit) {
-        int[] ss = getSSNums(fit, traverse);
-        return moveImages(traverse, fit, ss[0], ss[ss.length-1]);
-    }
-
-    public boolean moveImages(int traverse, int fit, int ssi) {
-        int[] ss = getSSNums(fit, traverse);
-        return moveImages(traverse, fit, ssi, ss[ss.length-1]);
-    }
-
-    public boolean moveImages(int traverse, int fit, int ssi, int ssf) {
-        //Establishes source nad destination path
-        String source = sdPath + "\\DCIM";
-        String imagePath = storagePath + "\\Images\\FIT" + fit;
-        String destPath = ahpdataPath + "\\AHPDATA\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
-
-        File[] images = new File(source).listFiles(); //retrieves files
-        int[] blackimgs = getBlack(images);
-
-        //move photos to storage directory
-        for (int i = 0 ; i < images.length ; i++){
-            copyFile(images[i], imagePath, images[i].toString());
-        }
-
-        //move images to ahp data
-        for (int i = 0 ; i < blackimgs.length-1; i++ ) {
-            for (int j = blackimgs[i] ; j < blackimgs[i+1] ; i++) {
-                copyFile(images[j], destPath + ssi++, images[j].toString());
-            }
-        }
-        for (int j = blackimgs[blackimgs.length-1] ; j < images.length ; j++) {
-            copyFile(images[j], destPath + ssi, images[j].toString());
-        }
-        if (ssi != ssf) { //checks to make sure the desired sample stations were covered
-            JOptionPane.showMessageDialog(gui, "Error moving photos", "Error", JOptionPane.WARNING_MESSAGE);
-            return false;
-        }
-
-        return true;
-    }
-
-    private int[] getBlack (File[] images) {
-        LinkedList<Integer> inds = new LinkedList<>();
-        inds.add(0);
-
-        for (int i = 0 ; i < images.length ; i++) {
-            BufferedImage img = null;
-            double avg = 0; //average rgb value
-
-            try {
-                img = ImageIO.read(images[i]); //reads in the image
-                for (int j = 0 ; j < img.getHeight(); j++) { //goes through all the pixels
-                    for (int k = 0 ; k < img.getWidth() ; k ++) {
-                        avg += img.getRGB(k, j); //summs of rgb values
-                    }
-                }
-                avg /= img.getHeight()*img.getWidth(); //finds average rgb value
-            } catch (IOException e) {
-                avg = Integer.MAX_VALUE; //if image loading failed, set aveage to MAX;
-            }
-
-            if (avg < 10)
-                inds.add(i); //adds image if it's black
-        }
-
-        int[] imgs = new int[inds.size()];
-        int count = 0;
-        for (int i : inds) {
-            imgs[count++] = i;
-        }
-        return imgs;
-    } */
 }

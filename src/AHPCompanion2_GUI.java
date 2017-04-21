@@ -5,6 +5,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import static java.awt.SystemColor.window;
@@ -36,6 +37,9 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
 
         fileChooser = new JFileChooser("./");
         fileChooser.setMultiSelectionEnabled(true); //allows selection of multiple images
+        ImagePreviewPanel preview = new ImagePreviewPanel();
+        fileChooser.setAccessory(preview);
+        fileChooser.addPropertyChangeListener(preview);
 
         //setting up spinners
         int exp = Calendar.getInstance().get(Calendar.YEAR) - 1999; //expedition number
@@ -82,13 +86,13 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
                     else if (ssfCombo.getSelectedItem().equals("Auto")) //defined start position
                         success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem());
                     else //both positions defined
-                        success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem(), (Integer) ssfCombo.getSelectedItem());
+                        success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), Integer.parseInt(ssiCombo.getSelectedItem().toString()), Integer.parseInt(ssfCombo.getSelectedItem().toString()));
                 }
 
                 //Moving Images
                 else if (scanOrImg.getSelectedItem().equals("Images")) { //opens a file chooser and allows user to select images on sample station at a time
                     fileChooser.setCurrentDirectory(new File(storagePathText.getText()));
-                    int[] ss = main.getSSNums((Integer)tSpinner.getValue(), (Integer) gSpinner.getValue());
+                    int[] ss = getSS((Integer)tSpinner.getValue(), (Integer) gSpinner.getValue());
                     String directory = "";
                     success = true;
                     for (int i = 0 ; i < ss.length; i++) {
@@ -103,15 +107,6 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
                     //backs up all the transfered images
                     if (!directory.equals(""))
                         success = main.backUp((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), directory);
-
-                    /* Code no longer useful after new implementation of moveImages
-                    if (ssiCombo.getSelectedItem().equals("Auto")) //completely automatic
-                        success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue());
-                    else if (ssfCombo.getSelectedItem().equals("Auto")) //defined start position
-                        success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem());
-                    else //both positions defined
-                        success = main.moveImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem(), (Integer) ssfCombo.getSelectedItem());
-                        */
                 }
 
                 //If it worked, tell user. If it didn't work, an error dialogue should have popped up.
@@ -128,6 +123,27 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
             new EditConfig(main.getConfig(), this); //opens up edit configuartion
         }
         updateComponents();
+    }
+
+    public int[] getSS (int traverse, int fit) {
+        int[] ss = main.getSSNums(traverse, fit);
+
+        if (!ssiCombo.getSelectedItem().equals("Auto")) { //defined start position
+            int start = Integer.parseInt(ssiCombo.getSelectedItem().toString()); //get start position
+            String selectedFin = ssfCombo.getSelectedItem().toString(); //get ssf text
+            int finish = (selectedFin.equals("Auto") ? ss[ss.length-1] : Integer.parseInt(selectedFin)); //if it's defined, set it at that, if not, set to end
+
+            ArrayList<Integer> nums = new ArrayList<Integer>();
+            for (int i : ss){
+                if (i >= start && i <= finish) nums.add(i);
+            }
+            ss = new int[nums.size()];
+            for (int i = 0 ; i < ss.length ; i++) {
+                ss[i] = nums.get(i);
+            }
+        }
+
+        return ss;
     }
 
     public void stateChanged (ChangeEvent e) {
@@ -150,7 +166,7 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
         ssfCombo.removeAllItems();
         ssiCombo.addItem("Auto");
         ssfCombo.addItem("Auto");
-        for (int i = 0 ; i < ss.length && scanOrImg.getSelectedItem().equals("Scans"); i++){
+        for (int i = 0 ; i < ss.length; i++){
             ssiCombo.addItem(""+ss[i]);
             ssfCombo.addItem(""+ss[i]);
         }
