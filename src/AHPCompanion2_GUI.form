@@ -44,25 +44,33 @@
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <toolTipText value="Group (FIT)"/>
+            </properties>
           </component>
           <component id="750c0" class="javax.swing.JSpinner" binding="tSpinner">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <toolTipText value="Current Traverse (0 for SIMs)"/>
+            </properties>
           </component>
           <component id="f120" class="javax.swing.JSpinner" binding="apSpinner">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <toolTipText value="Current Expedition"/>
+            </properties>
           </component>
           <component id="bd538" class="javax.swing.JComboBox" binding="scanOrImg">
             <constraints>
               <grid row="5" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <toolTipText value="Choose between moving scans and images."/>
+            </properties>
           </component>
           <component id="f70fc" class="javax.swing.JLabel">
             <constraints>
@@ -76,7 +84,9 @@
             <constraints>
               <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <toolTipText value="Initial  Sample Station Number (for the move)"/>
+            </properties>
           </component>
           <component id="85bd4" class="javax.swing.JLabel">
             <constraints>
@@ -90,7 +100,9 @@
             <constraints>
               <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <toolTipText value="Final Sample Station Number (for the move)"/>
+            </properties>
           </component>
         </children>
       </grid>
@@ -100,7 +112,9 @@
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <toolTipText value="Scans are moved from this path. The Image filechooser opens at this path."/>
+        </properties>
       </component>
       <component id="bda0e" class="javax.swing.JTextField" binding="destText">
         <constraints>
@@ -108,7 +122,9 @@
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <toolTipText value="Where files will be moved based on current settings."/>
+        </properties>
       </component>
       <component id="9c012" class="javax.swing.JTextField" binding="sourceText">
         <constraints>
@@ -116,7 +132,9 @@
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <toolTipText value="Where files will be backed up based on current settings."/>
+        </properties>
       </component>
       <component id="8395c" class="javax.swing.JLabel" binding="destPathLabel">
         <constraints>
@@ -148,6 +166,7 @@
             </constraints>
             <properties>
               <text value="Move"/>
+              <toolTipText value="Moves scans automatically. Opens file chooser for images."/>
             </properties>
           </component>
           <component id="95d3" class="javax.swing.JButton" binding="settingsBtn">
@@ -156,6 +175,7 @@
             </constraints>
             <properties>
               <text value="Settings"/>
+              <toolTipText value="Adjust the config.xml file for default file paths."/>
             </properties>
           </component>
           <hspacer id="ef5cc">
