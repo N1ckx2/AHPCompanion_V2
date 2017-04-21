@@ -1,8 +1,3 @@
-import com.sun.javafx.image.IntPixelGetter;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -11,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Calendar;
-import java.util.LinkedList;
 
 /**
  * Created by Nicholas Vadivelu on 2016-07-26.
@@ -65,13 +59,6 @@ public class AHP_Companion_2 {
         String USBsource = usbPath + "\\FIT" + fit;
 
         File[] scans = new File(USBsource).listFiles(); //retrieves files
-
-        //Make sure the number of files is correct, and if not don't proceed
-        /*
-        if (scans.length/4 != NUM_STATIONS[fit][traverse]) {
-            JOptionPane.showMessageDialog(gui, "" +scans.length/4 + " sample stations found, but there should be " + getSSNums(fit, traverse).length, "Error", JOptionPane.WARNING_MESSAGE);
-            return false;
-        }*/
 
         //Moves files into appropriate folders based on GTS
         int counter = 0; //to iterate through properly
@@ -145,5 +132,4 @@ public class AHP_Companion_2 {
     }
 
     public Configuration getConfig() { return config; }
-    public int getExpedition() {return expedition;}
 }

@@ -8,8 +8,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import static java.awt.SystemColor.window;
-
 /**
  * Created by Nicholas Vadivelu on 2016-07-27.
  */
@@ -104,7 +102,7 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
                         }
                     }
 
-                    //backs up all the transfered images
+                    //backs up all the transferred images
                     if (!directory.equals(""))
                         success = main.backUp((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), directory);
                 }
