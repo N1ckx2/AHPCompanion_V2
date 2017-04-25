@@ -56,6 +56,16 @@ public class AHP_Companion_2 {
         return usbScansToBackup(traverse, fit, ssi, ssf) && backupScansToAHP(traverse, fit, ssi, ssf);
     }
 
+    public boolean usbScansToBackup(int traverse, int fit) {
+        int[] ss = getSSNums(traverse, fit);
+        return usbScansToBackup(traverse, fit, ss[0], ss[ss.length-1]);
+    }
+
+    public boolean usbScansToBackup(int traverse, int fit, int ssi) {
+        int[] ss = getSSNums(traverse, fit);
+        return usbScansToBackup(traverse, fit, ssi, ss[ss.length-1]);
+    }
+
     public boolean usbScansToBackup (int traverse, int fit, int ssi, int ssf) {
         //Establishes source nad destination paths
         String ssrfPath = storagePath + "\\Scans\\T"+traverse+"\\FIT" + fit;
@@ -103,7 +113,7 @@ public class AHP_Companion_2 {
         return true;
     }
 
-    public boolean backUp (int traverse, int fit, String directory) {
+    public boolean backUpImages(int traverse, int fit, String directory) {
         //Backs up files
         String imagePath = storagePath + "\\Images\\T" + traverse + "\\FIT" + fit;
 

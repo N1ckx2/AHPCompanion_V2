@@ -18,7 +18,7 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
     private JLabel apLabel, gLabel, tLabel, destPathLabel, sourcePathLabel, storagePathLabel;
     private JSpinner apSpinner, gSpinner, tSpinner;
     private JComboBox<String> scanOrImg, ssiCombo, ssfCombo;
-    private JButton moveBtn, settingsBtn;
+    private JButton moveBtn, settingsBtn, backupButton;
     private AHP_Companion_2 main;
     private JFileChooser fileChooser;
     private Configuration config;
@@ -61,6 +61,7 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
         //set up action listener
         settingsBtn.addActionListener(this);
         moveBtn.addActionListener(this);
+        backupButton.addActionListener(this);
 
         setTitle("AHP Companion 2");
         setContentPane(panel);
@@ -104,13 +105,37 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
 
                     //backs up all the transferred images
                     if (!directory.equals(""))
-                        success = main.backUp((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), directory);
+                        success = main.backUpImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), directory);
                 }
 
-                //If it worked, tell user. If it didn't work, an error dialogue should have popped up.
-                if (success) {
-                    JOptionPane.showMessageDialog(this, "Moved!", "Move Successful", JOptionPane.INFORMATION_MESSAGE);
+
+
+            } else if (e.getSource() == backupButton) {
+                boolean success = true;
+                //Moving scans
+                if (scanOrImg.getSelectedItem().equals("Scans")) {
+                    if (ssiCombo.getSelectedItem().equals("Auto")) //completely automatic
+                        success = main.usbScansToBackup((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue());
+                    else if (ssfCombo.getSelectedItem().equals("Auto")) //defined start position
+                        success = main.usbScansToBackup((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem());
+                    else //both positions defined
+                        success = main.usbScansToBackup((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), Integer.parseInt(ssiCombo.getSelectedItem().toString()), Integer.parseInt(ssfCombo.getSelectedItem().toString()));
+                } else if (scanOrImg.getSelectedItem().equals("Images")) {
+                    fileChooser.setCurrentDirectory(new File(storagePathText.getText())); //create filechooser
+                    String directory = ""; //initialize directory
+
+                    fileChooser.setDialogTitle("Images Directory");
+                    int returnVal = fileChooser.showOpenDialog(this); //prompt user to choose directory
+                    if (returnVal == JFileChooser.APPROVE_OPTION)
+                        directory = fileChooser.getCurrentDirectory().toString();
+
+                    if (!directory.equals("")) //backup images if approved
+                        success = main.backUpImages((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), directory);
                 }
+                //If it worked, tell user. If it didn't work, an error dialogue should have popped up.
+                if (success)
+                    JOptionPane.showMessageDialog(this, "Moved!", "Move Successful", JOptionPane.INFORMATION_MESSAGE);
+
 
             } else if (e.getSource() == settingsBtn) {
                 setVisible(false);
