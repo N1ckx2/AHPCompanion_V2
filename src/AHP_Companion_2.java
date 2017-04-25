@@ -52,10 +52,13 @@ public class AHP_Companion_2 {
         return moveScans(traverse, fit, ssi, ss[ss.length-1]);
     }
 
-    public boolean moveScans(int traverse, int fit, int ssi, int ssf) {
+    public boolean moveScans(int traverse, int fit, int ssi, int ssf) { //both actions are seperate
+        return usbScansToBackup(traverse, fit, ssi, ssf) && backupScansToAHP(traverse, fit, ssi, ssf);
+    }
+
+    public boolean usbScansToBackup (int traverse, int fit, int ssi, int ssf) {
         //Establishes source nad destination paths
         String ssrfPath = storagePath + "\\Scans\\T"+traverse+"\\FIT" + fit;
-        String destPath = ahpdataPath + "\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
         String USBsource = usbPath + "\\FIT" + fit;
 
         File[] scans = new File(USBsource).listFiles(); //retrieves files
@@ -64,11 +67,25 @@ public class AHP_Companion_2 {
         int counter = 0; //to iterate through properly
         for (int i = ssi ; i <= ssf ; i++) {
             //into storage folder
-            copyFile(scans[counter], ssrfPath, "" + expedition+traverse+fit+(i)+"wd.jpg");
-            copyFile(scans[counter+1],   ssrfPath, "" + expedition+traverse+fit+(i)+"sm.jpg");
-            copyFile(scans[counter+2], ssrfPath,      "" + expedition+traverse+fit+(i)+"1.jpg");
-            copyFile(scans[counter+3], ssrfPath,      "" + expedition+traverse+fit+(i)+"2.jpg"); //add double slash in maybe
+            copyFile(scans[counter], ssrfPath, "" + expedition + traverse + fit + (i) + "wd.jpg");
+            copyFile(scans[counter + 1], ssrfPath, "" + expedition + traverse + fit + (i) + "sm.jpg");
+            copyFile(scans[counter + 2], ssrfPath, "" + expedition + traverse + fit + (i) + "1.jpg");
+            copyFile(scans[counter + 3], ssrfPath, "" + expedition + traverse + fit + (i) + "2.jpg"); //add double slash in maybe
+        }
 
+        return true;
+    }
+
+    public boolean backupScansToAHP(int traverse, int fit, int ssi, int ssf) {
+        //Establishes source nad destination paths
+        String ssrfPath = storagePath + "\\Scans\\T"+traverse+"\\FIT" + fit;
+        String destPath = ahpdataPath + "\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
+
+        File[] scans = new File(ssrfPath).listFiles(); //retrieves files
+
+        //Moves files into appropriate folders based on GTS
+        int counter = 0; //to iterate through properly
+        for (int i = ssi ; i <= ssf ; i++) {
             //into AHP data
             copyFile(scans[counter++], destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"wd.jpg");
             copyFile(scans[counter++],   destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"sm.jpg");
