@@ -69,18 +69,19 @@ public class AHP_Companion_2 {
     public boolean usbScansToBackup (int traverse, int fit, int ssi, int ssf) {
         //Establishes source nad destination paths
         String ssrfPath = storagePath + "\\Scans\\T"+traverse+"\\FIT" + fit;
-        String USBsource = usbPath + "\\FIT" + fit;
+        String USBsource = usbPath + "FIT" + fit;
 
         File[] scans = new File(USBsource).listFiles(); //retrieves files
 
         //Moves files into appropriate folders based on GTS
         int counter = 0; //to iterate through properly
-        for (int i = ssi ; i <= ssf ; i++) {
+        for (int i = ssi ; i <= ssf && counter < scans.length; i++) {
             //into storage folder
-            copyFile(scans[counter], ssrfPath, "" + expedition + traverse + fit + (i) + "wd.jpg");
-            copyFile(scans[counter + 1], ssrfPath, "" + expedition + traverse + fit + (i) + "sm.jpg");
-            copyFile(scans[counter + 2], ssrfPath, "" + expedition + traverse + fit + (i) + "1.jpg");
-            copyFile(scans[counter + 3], ssrfPath, "" + expedition + traverse + fit + (i) + "2.jpg"); //add double slash in maybe
+
+            copyFile(scans[counter++], ssrfPath, "" + expedition + fit + traverse + (i) + "1.jpg");
+            copyFile(scans[counter++], ssrfPath, "" + expedition + fit + traverse + (i) + "2.jpg"); //add double slash in maybe
+            copyFile(scans[counter++], ssrfPath, "" + expedition +  fit + traverse + (i) + "wd.jpg");
+            copyFile(scans[counter++], ssrfPath, "" + expedition + fit + traverse + (i) + "sm.jpg");
         }
 
         return true;
@@ -95,12 +96,13 @@ public class AHP_Companion_2 {
 
         //Moves files into appropriate folders based on GTS
         int counter = 0; //to iterate through properly
-        for (int i = ssi ; i <= ssf ; i++) {
+        for (int i = ssi ; i <= ssf && counter < scans.length ; i++) {
             //into AHP data
-            copyFile(scans[counter++], destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"wd.jpg");
-            copyFile(scans[counter++],   destPath + i + "\\Scans\\Drawings", "" + expedition+traverse+fit+(i)+"sm.jpg");
-            copyFile(scans[counter++], destPath + i + "\\Scans\\FDS",      "" + expedition+traverse+fit+(i)+"1.jpg");
-            copyFile(scans[counter++], destPath + i + "\\Scans\\FDS",      "" + expedition+traverse+fit+(i)+"2.jpg"); //add double slash in maybe
+
+            copyFile(scans[counter++], destPath + i + "\\Scans\\FDS",      "" + expedition+fit+traverse+(i)+"1.jpg");
+            copyFile(scans[counter++], destPath + i + "\\Scans\\FDS",      "" + expedition+fit+traverse+(i)+"2.jpg"); //add double slash in maybe
+            copyFile(scans[counter++], destPath + i + "\\Scans\\Drawings", "" + expedition+fit+traverse+(i)+"wd.jpg");
+            copyFile(scans[counter++],   destPath + i + "\\Scans\\Drawings", "" + expedition+fit+traverse+(i)+"sm.jpg");
         }
 
         return true;
