@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Calendar;
 
 /**
@@ -53,7 +54,7 @@ public class AHP_Companion_2 {
     }
 
     public boolean moveScans(int traverse, int fit, int ssi, int ssf) { //both actions are seperate
-        return usbScansToBackup(traverse, fit, ssi, ssf) && backupScansToAHP(traverse, fit, ssi, ssf);
+        return usbScansToBackup(traverse, fit, ssi, ssf) && usbScansToAHP(traverse, fit, ssi, ssf);
     }
 
     public boolean usbScansToBackup(int traverse, int fit) {
@@ -87,22 +88,22 @@ public class AHP_Companion_2 {
         return true;
     }
 
-    public boolean backupScansToAHP(int traverse, int fit, int ssi, int ssf) {
+    public boolean usbScansToAHP(int traverse, int fit, int ssi, int ssf) {
         //Establishes source nad destination paths
         String ssrfPath = storagePath + "\\Scans\\T"+traverse+"\\FIT" + fit;
         String destPath = ahpdataPath + "\\AP" + expedition + "\\FIT"+ fit + "\\T" + traverse + "\\SS";
+        String USBsource = usbPath + "FIT" + fit;
 
-        File[] scans = new File(ssrfPath).listFiles(); //retrieves files
-
+        File[] scans = new File(USBsource).listFiles(); //retrieves files
+        Arrays.sort(scans);
         //Moves files into appropriate folders based on GTS
         int counter = 0; //to iterate through properly
         for (int i = ssi ; i <= ssf && counter < scans.length ; i++) {
             //into AHP data
-
-            copyFile(scans[counter++], destPath + i + "\\Scans\\FDS",      "" + expedition+fit+traverse+(i)+"1.jpg");
-            copyFile(scans[counter++], destPath + i + "\\Scans\\FDS",      "" + expedition+fit+traverse+(i)+"2.jpg"); //add double slash in maybe
             copyFile(scans[counter++], destPath + i + "\\Scans\\Drawings", "" + expedition+fit+traverse+(i)+"wd.jpg");
             copyFile(scans[counter++],   destPath + i + "\\Scans\\Drawings", "" + expedition+fit+traverse+(i)+"sm.jpg");
+            copyFile(scans[counter++], destPath + i + "\\Scans\\FDS",      "" + expedition+fit+traverse+(i)+"1.jpg");
+            copyFile(scans[counter++], destPath + i + "\\Scans\\FDS",      "" + expedition+fit+traverse+(i)+"2.jpg"); //add double slash in maybe
         }
 
         return true;
