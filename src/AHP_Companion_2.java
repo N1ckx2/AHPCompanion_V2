@@ -45,11 +45,13 @@ public class AHP_Companion_2 {
 
     public boolean moveScans(int traverse, int fit) {
         int[] ss = getSSNums(traverse, fit);
+        Arrays.sort(ss);
         return moveScans(traverse, fit, ss[0], ss[ss.length-1]);
     }
 
     public boolean moveScans(int traverse, int fit, int ssi) {
         int[] ss = getSSNums(traverse, fit);
+        Arrays.sort(ss);
         return moveScans(traverse, fit, ssi, ss[ss.length-1]);
     }
 
@@ -59,11 +61,13 @@ public class AHP_Companion_2 {
 
     public boolean usbScansToBackup(int traverse, int fit) {
         int[] ss = getSSNums(traverse, fit);
+        Arrays.sort(ss);
         return usbScansToBackup(traverse, fit, ss[0], ss[ss.length-1]);
     }
 
     public boolean usbScansToBackup(int traverse, int fit, int ssi) {
         int[] ss = getSSNums(traverse, fit);
+        Arrays.sort(ss);
         return usbScansToBackup(traverse, fit, ssi, ss[ss.length-1]);
     }
 

@@ -83,7 +83,7 @@ public class AHPCompanion2_GUI extends JFrame implements ActionListener, ChangeL
                     if (ssiCombo.getSelectedItem().equals("Auto")) //completely automatic
                         success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue());
                     else if (ssfCombo.getSelectedItem().equals("Auto")) //defined start position
-                        success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), (Integer) ssiCombo.getSelectedItem());
+                        success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), Integer.parseInt((String)ssiCombo.getSelectedItem()));
                     else //both positions defined
                         success = main.moveScans((Integer) tSpinner.getValue(), (Integer) gSpinner.getValue(), Integer.parseInt(ssiCombo.getSelectedItem().toString()), Integer.parseInt(ssfCombo.getSelectedItem().toString()));
                 }
